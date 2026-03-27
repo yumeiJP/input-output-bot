@@ -6,7 +6,7 @@ from datetime import datetime
 from discord.ext import commands
 
 
-class Game:
+class Game:  # pylint: disable=too-many-instance-attributes
     """Full game session"""
 
     def __init__(self, channel, initiator_user_id, max_queries_per_round):
@@ -53,9 +53,6 @@ class IOGame(commands.Cog):
 
     async def end_recruitment(self, game):
         """Called after recruitment ends"""
-
-        # Implemented later
-        pass
 
     @commands.command()
     async def create(self, ctx, max_queries: int = 20):
