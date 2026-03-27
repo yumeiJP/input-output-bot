@@ -13,7 +13,7 @@ class Game:  # pylint: disable=too-many-instance-attributes
         self.channel = channel
         self.initiator_user_id = initiator_user_id
         self.max_queries_per_round = max_queries_per_round
-        self.players = {}
+        self.players_score = {}
         self.join_order = []
         self.recruitment_task = None
         self.recruitment_start = None
@@ -81,9 +81,27 @@ class IOGame(commands.Cog):
     async def join(self, ctx):
         """Allows players to join the game started"""
 
-        if ctx.channel.id not in self.games:
+        game = self.games.get(ctx.channel.id)
+
+        if game is None:
             await ctx.send("There is no game to join! Try -create to start a game!")
             return
+
+        if game.current_round_index != -1:
+            await ctx.send("The game already started! Please wait till it ends.")
+            return
+            # TODO: allow players to join regardless, starting with 0 points though.
+
+        player_id = ctx.author.id
+
+        if player_id in game.players_score:
+            await ctx.send("You are already in the game!")
+            return
+
+        game.join_order.append(player_id)
+        game.players_score[player_id] = 0.0
+
+        await ctx.send("You are now in the game!")
 
 
 async def setup(bot):
