@@ -51,8 +51,28 @@ class IOGame(commands.Cog):
         self.bot = bot
         self.games = {}
 
+    async def start_round(self, game):
+        # will implement
+        pass
+
     async def end_recruitment(self, game):
         """Called after recruitment ends"""
+
+        if game.recruitment_task:
+            game.recruitment_task.cancel()
+
+        if len(game.players_score) < 2:
+            await game.channel.send("Not enough players joined!")
+            del self.games[game.channel.id]
+            return
+
+        game.participant_list = game.join_order
+
+        # Indicate round starting
+        game.current_round_index = 0
+
+        await game.channel.send("Game has started!")
+        await self.start_round(game)
 
     @commands.command()
     async def create(self, ctx, max_queries: int = 20):
