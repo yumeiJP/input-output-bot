@@ -77,6 +77,14 @@ class IOGame(commands.Cog):
 
         await ctx.send("Game created! Use -join to join!")
 
+    @commands.command()
+    async def join(self, ctx):
+        """Allows players to join the game started"""
+
+        if ctx.channel.id not in self.games:
+            await ctx.send("There is no game to join! Try -create to start a game!")
+            return
+
 
 async def setup(bot):
     """Add the IOGame cog to the bot."""
