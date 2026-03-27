@@ -51,8 +51,14 @@ class IOGame(commands.Cog):
         self.bot = bot
         self.games = {}
 
+    async def end_recruitment(self, game):
+        """Called after recruitment ends"""
+
+        # Implemented later
+        pass
+
     @commands.command()
-    async def create(self, ctx, max_queries):
+    async def create(self, ctx, max_queries: int = 20):
         """Starts a new game (Recuritment phase)"""
         if ctx.channel.id in self.games:
             await ctx.send("There is already a game starting!")
