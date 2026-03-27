@@ -1,0 +1,8 @@
+-r requirements.txt
+black
+isort
+flake8
+pylint
+sourcery
+pytest
+pre-commit
