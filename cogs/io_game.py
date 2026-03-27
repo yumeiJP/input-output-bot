@@ -61,8 +61,13 @@ class IOGame(commands.Cog):
         if game.recruitment_task:
             game.recruitment_task.cancel()
 
-        if len(game.players_score) < 2:
-            await game.channel.send("Not enough players joined!")
+        if len(game.players_score) < 1:
+
+            try:
+                await game.channel.send("Not enough players joined!")
+            except Exception as e:
+                print(f"Error sending message: {e}")
+
             del self.games[game.channel.id]
             return
 
@@ -71,7 +76,11 @@ class IOGame(commands.Cog):
         # Indicate round starting
         game.current_round_index = 0
 
-        await game.channel.send("Game has started!")
+        try:
+            await game.channel.send("Game has started!")
+        except Exception as e:
+            print(f"Error sending message: {e}")
+
         await self.start_round(game)
 
     @commands.command()
@@ -89,7 +98,7 @@ class IOGame(commands.Cog):
         self.games[ctx.channel.id] = game
 
         async def recruitment_timeout():
-            await asyncio.sleep(30)
+            await asyncio.sleep(3)
             await self.end_recruitment(game)
 
         game.recruitment_task = asyncio.create_task(recruitment_timeout())
