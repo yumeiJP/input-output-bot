@@ -1,9 +1,9 @@
 """Main bot module."""
 
 import asyncio
-import yaml
 
 import discord
+import yaml
 from discord.ext import commands
 
 # Load bot token
