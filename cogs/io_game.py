@@ -75,6 +75,11 @@ class IOGame(commands.Cog):
         game.recruitment_task = asyncio.create_task(recruitment_timeout())
         game.recruitment_start = datetime.utcnow()
 
+        player_id = ctx.author.id
+
+        game.join_order.append(player_id)
+        game.players_score[player_id] = 0.0
+
         await ctx.send("Game created! Use -join to join!")
 
     @commands.command()
