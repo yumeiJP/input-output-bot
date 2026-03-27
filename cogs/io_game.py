@@ -39,7 +39,7 @@ class PlayerRoundState:
 
     def __init__(self, user_id):
         self.user_id = user_id
-        self.potential_points = 1000
+        self.potential_points = 1000.0
         self.solved = False
 
 
