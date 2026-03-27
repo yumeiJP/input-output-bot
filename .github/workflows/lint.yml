@@ -1,0 +1,30 @@
+name: Lint
+
+on:
+  push:
+    branches: [ dev, main ]
+  pull_request:
+    branches: [ dev, main ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install pylint black isort flake8 sourcery
+          pip install -r requirements.txt
+      - name: Run black
+        run: black --check --diff .
+      - name: Run isort
+        run: isort --check --diff .
+      - name: Run flake8
+        run: flake8
+      - name: Run pylint
+        run: pylint $(git ls-files '*.py')
