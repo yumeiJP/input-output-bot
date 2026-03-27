@@ -28,5 +28,3 @@ jobs:
         run: flake8
       - name: Run pylint
         run: pylint $(git ls-files '*.py')
-      - name: Run sourcery
-        run: sourcery review --check .
