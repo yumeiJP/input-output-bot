@@ -51,8 +51,37 @@ class IOGame(commands.Cog):
         self.bot = bot
         self.games = {}
 
+    async def start_round(self, game):
+        # will implement
+        pass
+
     async def end_recruitment(self, game):
         """Called after recruitment ends"""
+
+        if game.recruitment_task:
+            game.recruitment_task.cancel()
+
+        if len(game.players_score) < 1:
+
+            try:
+                await game.channel.send("Not enough players joined!")
+            except Exception as e:
+                print(f"Error sending message: {e}")
+
+            del self.games[game.channel.id]
+            return
+
+        game.participant_list = game.join_order
+
+        # Indicate round starting
+        game.current_round_index = 0
+
+        try:
+            await game.channel.send("Game has started!")
+        except Exception as e:
+            print(f"Error sending message: {e}")
+
+        await self.start_round(game)
 
     @commands.command()
     async def create(self, ctx, max_queries: int = 20):
@@ -69,7 +98,7 @@ class IOGame(commands.Cog):
         self.games[ctx.channel.id] = game
 
         async def recruitment_timeout():
-            await asyncio.sleep(30)
+            await asyncio.sleep(3)
             await self.end_recruitment(game)
 
         game.recruitment_task = asyncio.create_task(recruitment_timeout())
