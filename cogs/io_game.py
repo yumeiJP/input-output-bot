@@ -3,6 +3,7 @@
 import asyncio
 from datetime import datetime
 
+import numexpr as ne
 from discord.ext import commands
 
 
@@ -28,7 +29,7 @@ class Round:
         self.creator_id = creator_user_id
         self.max_queries = max_queries
         self.penalty = 1000.0 / max_queries
-        self.secret_expr = None
+        self.secret_function = None
         self.players = {}
         self.active = False
 
@@ -49,10 +50,23 @@ class IOGame(commands.Cog):
         """Initialize the cog."""
         self.bot = bot
         self.games = {}
+        self.pending_creators = {}
+
+    async def start_round(self, game, function_creator):
+        """Starts the round"""
+        max_queries = game.max_queries_per_round
+        round = Round(function_creator, max_queries)
+        game.rounds.append(round)
+
+        await function_creator.send("Please choose a function.")
+        self.pending_creators[function_creator] = game
 
     async def start_game(self, game):
-        # will implement
-        pass
+        """Chooses a function creator and starts the game"""
+        for player in game.player_list:
+
+            function_creator = player
+            self.start_round(game, function_creator)
 
     async def end_recruitment(self, game):
         """Called after recruitment ends"""
@@ -135,6 +149,47 @@ class IOGame(commands.Cog):
         game.players_score[player_id] = 0.0
 
         await ctx.send("You are now in the game!")
+
+    async def check_valid_expression(self, expression):
+        try:
+            ne.evaluate(expression, local_dict={"x": 0})
+            return True
+        except Exception:
+            return False
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        """Handles messages from creators and players"""
+
+        if message.author.bot:
+            return
+        if message.guild is not None:
+            return
+
+        if message.author.id in self.pending_creators:
+            # Sent from creator
+            # Trying to input a function
+
+            content = message.content.strip()
+
+            valid = self.check_valid_expression(content)
+
+            user = message.author.id
+
+            if not valid:
+                await user.send(
+                    "You did not send a valid expression! Please try again."
+                )
+                return
+
+            await user.send("Valid expression")
+
+            game = self.pending_creators[message.author.id]
+            round_index = game.current_round_index
+            round = game.rounds[round_index]
+            round.secret_function = content
+
+            self.pending_creators.pop(message.author.id)
 
 
 async def setup(bot):
