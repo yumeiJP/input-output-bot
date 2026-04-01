@@ -97,7 +97,7 @@ class IOGame(commands.Cog):
         self.games[ctx.channel.id] = game
 
         async def recruitment_timeout():
-            await asyncio.sleep(30)
+            await asyncio.sleep(3)
             await self.end_recruitment(game)
 
         game.recruitment_task = asyncio.create_task(recruitment_timeout())
